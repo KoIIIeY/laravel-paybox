@@ -25,16 +25,16 @@ class PayboxStatus
         self::PG_TS_STATUS_INCOMPLETE => "Истекло время жизни платежа",
     ];
 
-    public string $pg_status;
-    public string $pg_payment_id;
-    public string $pg_transaction_status;
-    public int $pg_pg_can_reject;
-    public int $pg_testing_mode;
-    public int $pg_captured;
-    public string $pg_card_pan;
-    public string $pg_create_date;
-    public string $pg_salt;
-    public string $pg_sig;
+    public $pg_status;
+    public $pg_payment_id;
+    public $pg_transaction_status;
+    public $pg_pg_can_reject;
+    public $pg_testing_mode;
+    public $pg_captured;
+    public $pg_card_pan;
+    public $pg_create_date;
+    public $pg_salt;
+    public $pg_sig;
 
     /**
      * @return string
