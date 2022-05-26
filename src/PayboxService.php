@@ -14,12 +14,12 @@ use Illuminate\Validation\ValidationException;
  */
 class PayboxService
 {
-    public PayboxStatus $status;
+    public  $status;
 
     /**
      * @var array
      */
-    protected array $config = [];
+    protected $config = [];
 
     /**
      * @param $config
@@ -36,14 +36,18 @@ class PayboxService
      * @throws ValidationException
      * @throws \Exception
      */
-    public function generate(array $data = []): \SimpleXMLElement
+    public function generate(array $data = [])
     {
         $validator = Validator::make($data, ((new NewPaymentPayboxRequest())->rules()));
-        if ($validator->fails())
+        if ($validator->fails()){
             throw new ValidationException($validator);
+        }
+
 
         $this->generateSig($data, 'init_payment.php');
-        return $this->request('post', $this->fullPath('init_payment'), $data);
+//        dd($data);
+        $res = $this->request('post', $this->fullPath('init_payment'), $data);
+        return $res;
     }
 
     /**
@@ -51,7 +55,7 @@ class PayboxService
      * @param $data
      * @throws \Exception
      */
-    public function paymentInfo(array $data): static
+    public function paymentInfo(array $data)
     {
         $validator = Validator::make($data, ((new PayboxStatusPaymentRequest())->rules()));
         if ($validator->fails())
@@ -70,7 +74,7 @@ class PayboxService
      * @param $route
      * @return string
      */
-    private function fullPath($route): string
+    private function fullPath($route)
     {
         return $this->config['url'] . '/' . $this->config['routes'][$route];
     }
@@ -78,17 +82,19 @@ class PayboxService
     /**
      * @throws \Exception
      */
-    private function request(string $verb, string $route, array $data): \SimpleXMLElement
+    private function request(string $verb, string $route, array $data)
     {
         $v = strtolower($verb);
-        $response = Http::{$v}($route, $data);
-        if (!$response->ok())
-            throw new \Exception($response->body());
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request($v, $route, ['form_params' => $data]);
+//        $response = Http::{$v}($route, $data);
+        if ($response->getStatusCode() != 200)
+            throw new \Exception($response->getBody());
 
-        $data = simplexml_load_string($response->body());
+        $data = simplexml_load_string($response->getBody());
 
         if ($data->pg_status != 'ok')
-            throw new \Exception($response->body());
+            throw new \Exception($response->getBody());
 
         return $data;
     }
@@ -96,7 +102,7 @@ class PayboxService
     /**
      * @return PayboxStatus
      */
-    public function getStatus(): PayboxStatus
+    public function getStatus()
     {
         return $this->status;
     }
@@ -104,7 +110,7 @@ class PayboxService
     /**
      * @param PayboxStatus $status
      */
-    public function setStatus(PayboxStatus $status): void
+    public function setStatus(PayboxStatus $status)
     {
         $this->status = $status;
     }
@@ -129,7 +135,7 @@ class PayboxService
      * Имя делаем вида tag001subtag001
      * Чтобы можно было потом нормально отсортировать и вложенные узлы не запутались при сортировке
      */
-    private function makeFlatParamsArray($arrParams, $parent_name = ''): array
+    private function makeFlatParamsArray($arrParams, $parent_name = '')
     {
         $arrFlatParams = [];
         $i = 0;
