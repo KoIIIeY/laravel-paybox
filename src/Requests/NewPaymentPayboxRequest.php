@@ -29,7 +29,7 @@ class NewPaymentPayboxRequest extends FormRequest
             'pg_amount' => ['required', 'numeric'],
             'pg_description' => ['required', 'string'],
             'pg_salt' => ['required', 'string'],
-            'pg_currency' => 'in:KZT,USD,EUR|string',
+            'pg_currency' => 'in:KZT,USD,EUR,RUB|string',
             'pg_check_url' => 'string',
             'pg_result_url' => 'string',
             'pg_request_method' => 'string|in:GET,POST,XML',
